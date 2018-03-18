@@ -1,5 +1,3 @@
-
-
 //ゲームコントローラ
 
 var GP0 = 0;
@@ -37,10 +35,46 @@ var config = {
         ]
     },
     options: {
+        scales: {
+            yAxes:[
+                {
+                    ticks:{
+                        beginAtZero: true,
+                        min: -1,
+                        max: 1,
+                    }
+                }
+            ]
+        }
+    }
+};
+var COLORS2 = null;
+var config2 = {
+    type: 'line',
+    data:{
+        labels: [],
+        datasets: [
+        ]
+    },
+    options: {
+        scales: {
+            yAxes:[
+                {
+                    ticks:{
+                        beginAtZero: true,
+                        min: 0,
+                        max: 1,
+                    }
+                }
+            ]
+        }
     }
 };
 var ctx = $("#canvas")[0].getContext('2d');
 var chart = new Chart(ctx, config);
+var ctx2 = $("#button_canvas")[0].getContext('2d');
+var chart2 = new Chart(ctx2, config2);
+var start = 0;
 
 function gpLoop(){
     //コントローラのボタンが押されたかどうかの状態(スナップショット)
@@ -51,27 +85,43 @@ function gpLoop(){
         return;
     }
     var gp = gps[0];
-    console.debug(gp);
     if(COLORS == null){
         COLORS = [];
         for(i = 0; i < gp.axes.length; i++){
             COLORS.push(getRandomColor());
             config.data.datasets.push({label: 'axis'+i, borderColor: COLORS[i], data:[]});
         }
+        COLORS2 = [];
+        for(i = 0; i < gp.buttons.length; i++){
+            COLORS2.push(getRandomColor());
+            config2.data.datasets.push({label: 'button'+i, borderColor: COLORS2[i], data:[]});
+        }
+        start = gp.timestamp;
+        console.log(start);
+        console.log(gp);
     }
     if((prev != null) && (gp.timestamp == prev.timestamp)){
-        //console.log("return " + prev + gp);
-        //console.log("return "+gp.timestamp +" "+prev.timestamp+" "+(prev.timestamp-gp.timestamp));
         window.requestAnimationFrame(gpLoop);
         return;
     }
-    //console.debug(gp);
-    config.data.labels.push(gp.timestamp);
+    //msec
+    var elapsed_time = (gp.timestamp - start)/1000;
+    //console.log(start);
+    config.data.labels.push(elapsed_time);
     for(i = 0; i < gp.axes.length; i++){
         config.data.datasets[i].data.push(gp.axes[i]);
     }
     chart.update();
-    
+
+    config2.data.labels.push(elapsed_time);
+    for(i = 0; i < gp.buttons.length; i++){
+        var v = 0;
+        if(gp.buttons[i].pressed){
+            v = 1;
+        }
+        config2.data.datasets[i].data.push(v);
+    }
+    chart2.update();
     // var button = getGPButton(gp, prev);
     // if(button != null){
     //     console.log(button);
@@ -83,5 +133,3 @@ function gpLoop(){
 
 //window.requestAnimationFrame(gpLoop);
 window.addEventListener('gamepadconnected', function(e){ window.requestAnimationFrame(gpLoop); });
-
-
