@@ -39,7 +39,13 @@ function init_config(line){
             ]
         }
     };
-    
+    try {
+        parseInt(row[0]);
+        USE_DATA_HEADER = false;
+    }
+    catch(e){
+        USE_DATA_HEADER = true;
+    }
     for (var index = 1; index < row.length; index++){
         var rowindex = index - 1;
         COLORS.push(getRandomColor());
@@ -51,7 +57,11 @@ function init_config(line){
         else {
             header = PREFIX+rowindex;
         }
-        config.data.datasets.push({label: header, borderColor: COLORS[rowindex], data:[]});
+        config.data.datasets.push({label: header,
+                                   borderColor: COLORS[rowindex],
+                                   backgroundColor: COLORS[rowindex],
+                                   data:[],
+                                   fill: false});
     }
 }
 
