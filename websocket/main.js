@@ -17,8 +17,7 @@ var PREFIX = 'buf';
 var USE_DATA_HEADER = false;
 var socket = null;
 var initialized = false;
-var next_row_index = 0;
-var last_timestamp = 0;
+var start_timestamp = 0;
 var chart;
 
 function init_config(line){
@@ -74,42 +73,34 @@ function init_plot(){
     window.chart = new Chart(ctx, config);
 }
 
-function plot_data(csv){
-    var csvtext = csv;
-    //time,
-    var lines = csvtext.split('\n');
+function plot_data(lines){
     if(!initialized){
         init_config(lines[0]);
         initialized = true;
     }
-    console.log("plot_data: %d %d diff %d\n%s", next_row_index, lines.length, lines.length-next_row_index, csv);
-    if(lines.length < next_row_index){
-        return;
-    }
     
-    for (var i = next_row_index; i < lines.length; i++){
+    for (var i = 0; i < lines.length; i++){
         var line = lines[i];
-        if(line == ""){
+        if(line.length == 0 || line.charCodeAt(0) == 0){
+            //console.log("no timestamp continue");
             continue;
         }
-        console.log("line: %d %s", i, line);
+
         var row = line.split(',');
-        var timestamp = row[0];
-        //TODO; use index
-        // if(timestamp <= last_timestamp){
-        //     continue;
-        // }
-        last_timestamp = timestamp;
-        config.data.labels.push(timestamp);
+        var timestamp = parseInt(row[0]);
+        if(start_timestamp == 0){
+            start_timestamp = timestamp;
+        }
+
+        config.data.labels.push(timestamp - start_timestamp);
         //column
-        console.log("row length: %d %s", row.length, line);
         for (var index = 1; index < row.length; index++){
             var colindex = index - 1;
             config.data.datasets[colindex].data.push(parseInt(row[index]));
         }
     }
     //TODO; remove empty row
-    next_row_index = lines.length - 1;
+    //next_row_index = lines.length - 1;
     window.chart.update();
 }
 
@@ -137,12 +128,12 @@ function onError(event){
 }
 
 function onMessage(event){
-    console.log("message: ")
     console.log(event);
     var elm = $('#csvdata');
     var csv = elm.val()+event.data;
     elm.val(csv);
-    plot_data(csv);
+    var newcsv = event.data.split("\n");
+    plot_data(newcsv);
 }
 
 $(document).ready(function(){
