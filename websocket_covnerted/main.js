@@ -15,13 +15,23 @@ var start = 0;
 var COLORS = null;
 var PREFIX = 'buf';
 var USE_DATA_HEADER = false;
+var WINDOW_LEN = 300;
 var socket = null;
 var initialized = false;
 var start_timestamp = 0;
-var chart;
+
+
+function parseLine(line){
+    var row = line.split(',');
+    if(row[row.length-1] == ""){
+        row.pop();
+    }
+    return row;
+}
+
 
 function init_config(line){
-    var row = line.split(',');
+    var row = parseLine(line);
     COLORS = [];
     //column
     config.type = 'line';
@@ -68,7 +78,8 @@ function init_config(line){
                                    hidden: true,
                                    fill: false});
     }
-    var headers = ['roll', 'pitch', 'view'];
+    var headers = ['roll', 'pitch', 'yaw', 'view'];
+    var target_header = ['pitch', 'hi', 'lo'];
     for (var index = 0; index < headers.length; index++){
         COLORS.push(getRandomColor());
         var header = headers[index];
@@ -76,6 +87,7 @@ function init_config(line){
                                    borderColor: COLORS[COLORS.length-1],
                                    backgroundColor: COLORS[COLORS.length-1],
                                    data:[],
+                                   hidden: target_header.indexOf(header) < 0,
                                    fill: false});
     }
 }
@@ -89,43 +101,49 @@ function plot_data(lines){
         init_config(lines[0]);
         initialized = true;
     }
-    
     for (var i = 0; i < lines.length; i++){
         var line = lines[i];
         if(line.length == 0 || line.charCodeAt(0) == 0){
             //console.log("no timestamp continue");
             continue;
         }
-
-        var row = line.split(',');
+        console.log("line: " + line);
+        var row = parseLine(line);
+        row = row.map(function(x){ return parseInt(x); });
         var timestamp = parseInt(row.shift());
         if(start_timestamp == 0){
             start_timestamp = timestamp;
         }
         var roll = ((row[1] & 0x03) << 8) + (row[0] & 0xFF);
-        var sroll = Number(roll).toString(16);
-
-        // if((roll & 0x200) == 0x200){
-        //     roll = -1*(0x400 - roll);
-        // }
         var pitch = ((row[2] & 0x0f) << 6) | (((row[1] & 0xfc) >> 2) & 0x3F);
-        spitch = Number(pitch).toString(16);
-        console.log("spitch %s", spitch);
+        
+        // var hi =  row[2] & 0x0f;
+        // var lo =  (row[1] & 0xfc) >> 2;
+        // var spitch = Number(pitch).toString(16);
+        //console.log("spitch %s | %s %s", spitch,  hi.toString(16), lo.toString(16));
 
+        //ひねり
+        var yaw = row[3];
         var view = (row[2] & 0xf0) >> 4;
 
-        row = row.concat([roll, pitch, view]);
+        row = row.concat([roll, pitch, yaw, view]);
         config.data.labels.push(timestamp - start_timestamp);
         //column
         for (var index = 0; index < row.length; index++){
             config.data.datasets[index].data.push(parseInt(row[index]));
+            var dt = config.data.datasets[index].data;
+            if(WINDOW_LEN < dt.length){
+                config.data.datasets[index].data.unshift();
+            }
         }
         row.unshift(timestamp);
         var elm = $('#csvdata');
-        var csvline = row.join(",")+"\n";
-        console.log(csvline);
+        //console.log("row[1]" + row[1]);
+        var csvline = row.map(function(x){return x.toString();}).join(",")+"\n";
+        //console.log(csvline);
         var csv = elm.val() + csvline;
         elm.val(csv);
+        $(elm).scrollTop($(elm)[0].scrollHeight);
     }
     //TODO; remove empty row
     //next_row_index = lines.length - 1;
@@ -156,7 +174,7 @@ function onError(event){
 }
 
 function onMessage(event){
-    console.log(event);
+    //console.log(event);
     //var elm = $('#csvdata');
     //var csv = elm.val()+event.data;
     //elm.val(csv);
