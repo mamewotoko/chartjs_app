@@ -96,7 +96,24 @@ function init_plot(){
     window.chart = new Chart(ctx, config);
 }
 
-function plot_data(lines){
+function plot_data_rqlog(lines){
+
+    var prev_time = 0;
+    for (var i = 0; i < lines.length; i++){
+        var line = lines[i];
+        if(line.length == 0 || line.charCodeAt(0) == 0){
+            //console.log("no timestamp continue");
+            continue;
+        }
+        console.log("line: " + line);
+        var row = parseLine(line);
+        var timestamp = row.shift();
+        line = i + " " + line;
+        
+    }
+}
+
+function plot_data_csv(lines){
     if(!initialized){
         init_config(lines[0]);
         initialized = true;

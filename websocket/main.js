@@ -20,8 +20,18 @@ var initialized = false;
 var start_timestamp = 0;
 var chart;
 
-function init_config(line){
+function make_row(line){
     var row = line.split(',');
+    //
+    var start = 0;
+    var end = 10;
+    row = row.slice(start, Math.min(end, row.length-1));
+    return row;
+}
+
+function init_config(line){
+    //var row = line.split(',');
+    var row = make_row(line);
     COLORS = [];
     //column
     config.type = 'line';
@@ -86,7 +96,12 @@ function plot_data(lines){
             continue;
         }
 
-        var row = line.split(',');
+        // var row = line.split(',');
+        // //
+        // var start = 0;
+        // var end = 10;
+        // row = row.slice(start, Math.max(end, row.length-1));
+        var row = make_row(line);
         var timestamp = parseInt(row[0]);
         if(start_timestamp == 0){
             start_timestamp = timestamp;
