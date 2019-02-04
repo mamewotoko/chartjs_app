@@ -1,0 +1,48 @@
+#! /usr/bin/env python3
+
+import sys
+import re
+import json
+
+monthname2day = {
+    'Jan': '01',
+    'Feb': '02',
+    'Mar': '03',
+    'Apr': '04',
+    'May': '05',
+    'Jun': '06',
+    'Jul': '07',
+    'Aug': '08',
+    'Sep': '09',
+    'Oct': '10',
+    'Nov': '11',
+    'Dec': '12'
+}
+
+
+if __name__ == '__main__':
+    events = []
+    regexp = re.compile(r'^.*\[(.*)\].*$')
+    for line in sys.stdin:
+        m = regexp.match(line)
+        if m is None:
+            continue
+        datepart = m.group(1)
+        date_and_offset = datepart.split(' ')
+        date = date_and_offset[0]
+        offset = date_and_offset[1]
+        date = date.replace(':', '/')
+        split = date.split('/')
+        day = split[0]
+        month = monthname2day[split[1]]
+        year = split[2]
+        hour = split[3]
+        minute = split[4]
+        sec = split[5]
+
+        json_date = '%s%s%sT%s%s%s%s' % (year, month, day, hour, minute, sec, offset)
+        # print(json_date)
+        events.append({'start': json_date, 'title': line})
+
+    j = {'dateTimeFormat': 'iso8601', 'events': events}
+    print(json.dumps(j, indent=2))
