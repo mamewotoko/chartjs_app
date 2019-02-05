@@ -6,33 +6,62 @@
    <script src="api/timeline-api.js" type="text/javascript"></script>
    <script>
      function onLoad(){
+         var height = window.innerHeight;
+         document.getElementById('tl').style.height = (height - 80)+"px";
          var eventSource = new Timeline.DefaultEventSource();
          var theme = Timeline.ClassicTheme.create();
+         console.log('height ' + height);
          theme.event.bubble.width = 350;
          theme.event.bubble.height = 300;
-         var d = Timeline.DateTime.parseGregorianDateTime("2019-02-04")
+         var d = Timeline.DateTime.parseGregorianDateTime("2017-07-21")
          var bandInfos = [
                 Timeline.createBandInfo({
-                    width:          "100%", 
+                    width:          "96%", 
                     intervalUnit:   Timeline.DateTime.HOUR,
-                    intervalPixels: 100,
+                    intervalPixels: 500,
                     eventSource:    eventSource,
                     date:           d,
                     theme:          theme,
                     layout:         'detailed'  // original, overview, detailed
                 }),
+                Timeline.createBandInfo({
+                    width:          "3%", 
+                    intervalUnit:   Timeline.DateTime.MONTH,
+                    intervalPixels: 100,
+                    eventSource:    eventSource,
+                    date:           d,
+                    theme:          theme,
+                    layout:         'overview'  // original, overview, detailed
+                }),
+                Timeline.createBandInfo({
+                    width:          "1%", 
+                    intervalUnit:   Timeline.DateTime.YEAR,
+                    intervalPixels: 500,
+                    eventSource:    eventSource,
+                    date:           d,
+                    theme:          theme,
+                    layout:         'overview'  // original, overview, detailed
+                }),
             ];
-            bandInfos[0].syncWith = 0;
-            bandInfos[0].highlight = true;
+            bandInfos[1].syncWith = 0;
+            bandInfos[1].highlight = true;
+            bandInfos[2].syncWith = 0;
+            bandInfos[2].highlight = true;
 
          var tl = Timeline.create(document.getElementById("tl"), bandInfos, Timeline.HORIZONTAL);
+         //var tl = Timeline.create(document.getElementById("tl"), bandInfos, Timeline.VERTICAL);
          tl.loadJSON("./event.json", function(json, url) { eventSource.loadJSON(json, url); });
          
      }
    </script>
+   <style>
+     .timeline-band-layer div {
+         font-size: 10px;
+     }
+   </style>
    <title>Timeline plot</title>
 </head>
 <body onload="onLoad();">
-  <h2>Timeline plot; apache.log</h2>
-<div id="tl" class="timeline-default" style="height: 1800px; margin-top: 20px; margin-bottom: 50px;"></div>
+  <h2>Timeline plot: apache.log</h2>
+  <div id="tl" class="timeline-default" style="height: 100%;"></div>
 </body></html>

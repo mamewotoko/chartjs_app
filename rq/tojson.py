@@ -1,5 +1,6 @@
 #! /usr/bin/env python3
 
+import csv
 import sys
 import re
 import json
@@ -20,12 +21,19 @@ monthname2day = {
 }
 
 
+filter_regxp = re.compile(r'.*(/grafana/|Bot|bot|munin).*')
+
 if __name__ == '__main__':
     events = []
     regexp = re.compile(r'^.*\[(.*)\].*$')
-    for line in sys.stdin:
+    reader = csv.reader(sys.stdin, delimiter=' ', quotechar='"')
+    for row in reader:
+        line = ' '.join(row)
         m = regexp.match(line)
         if m is None:
+            continue
+        mm = filter_regxp.match(line)
+        if mm is not None:
             continue
         datepart = m.group(1)
         date_and_offset = datepart.split(' ')
@@ -42,7 +50,14 @@ if __name__ == '__main__':
 
         json_date = '%s%s%sT%s%s%s%s' % (year, month, day, hour, minute, sec, offset)
         # print(json_date)
-        events.append({'start': json_date, 'title': line})
+        ev = {'start': json_date, 'title': line}
+        status = int(row[6])
+        # print('status: %s' % status)
+        if 200 <= status and status < 300:
+            ev['icon'] = './api/images/green-circle.png'
+        elif 400 <= status and status < 500:
+            ev['icon'] = './api/images/dark-red-circle.png'
+        events.append(ev)
 
     j = {'dateTimeFormat': 'iso8601', 'events': events}
     print(json.dumps(j, indent=2))
