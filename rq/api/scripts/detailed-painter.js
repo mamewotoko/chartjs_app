@@ -265,6 +265,7 @@ Timeline.DetailedEventPainter.prototype.paintImpreciseInstantEvent = function(ev
     
     var self = this;
     var clickHandler = function(elmt, domEvt, target) {
+
         return self._onClickInstantEvent(iconElmtData.elmt, domEvt, evt);
     };
     SimileAjax.DOM.registerEvent(iconElmtData.elmt, "mousedown", clickHandler);

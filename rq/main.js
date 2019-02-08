@@ -9,8 +9,6 @@ function getRandomColor() {
 
 var config = {};
 
-var ctx = $("#canvas")[0].getContext('2d');
-var chart = new Chart(ctx, config);
 var start = 0;
 var PREFIX = 'buf';
 var USE_DATA_HEADER = false;
@@ -53,10 +51,7 @@ function parse_line(line){
     return m;
 }
 
-function plot_data(){
-    var csvtext = $('#csvdata').val();
-    //time,
-    var lines = csvtext.split('\n');
+function plot_data(chart, lines){
     var initialized = false;
     var prev = 0;
     
@@ -87,7 +82,20 @@ function plot_data(){
     chart.update();
 }
 
+function plot_detail(lines){
+    
+}
+
 $(document).ready(function(){
+    var ctx = $("#canvas")[0].getContext('2d');
+    var chart = new Chart(ctx, config);
+
     $('#csvdata').bind('input propertychange', plot_data);
-    plot_data();
+    var csvtext = $('#csvdata').val();
+    //time,
+    var lines = csvtext.split('\n');
+    plot_data(lines);
+
+    
+    //plot_detail(lines);
 });
