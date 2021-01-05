@@ -37,7 +37,7 @@ function init_config(){
     };
     //COLORS.push(getRandomColor());
     var color = getRandomColor();
-    
+
     var header = "elapsed sec";
     config.data.datasets.push({label: header,
                                borderColor: color,
@@ -54,12 +54,13 @@ function parse_line(line){
 }
 
 function plot_data(){
-    var csvtext = $('#csvdata').val();
+    //var csvtext = $('#csvdata').val();
+    var csvtext = window.editor.getValue();
     //time,
     var lines = csvtext.split('\n');
     var initialized = false;
     var prev = 0;
-    
+
     init_config(row);
 
     for (var i = 0; i < lines.length; i++){
@@ -81,15 +82,22 @@ function plot_data(){
         }
         prev = epoch;
         var timestamp = row[1];
-        config.data.labels.push(timestamp);
+        config.data.labels.push((i+1) + ": " + timestamp);
         //column
         console.log(line);
         config.data.datasets[0].data.push(data);
     }
+    console.log("plot_data");
     chart.update();
 }
 
 $(document).ready(function(){
-    $('#csvdata').bind('input propertychange', plot_data);
+    window.editor = ace.edit("csvdata");
+    editor.setTheme("ace/theme/twilight");
+    editor.setKeyboardHandler("ace/keyboard/emacs");
+    //TODO; handle value is changed
+    //TODO: cache previous data and compare
+    $('#csvdata').on("keyup paste", plot_data);
+    //$('#csvdata').bind('input propertychange', plot_data);
     plot_data();
 });
