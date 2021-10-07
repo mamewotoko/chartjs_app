@@ -48,7 +48,7 @@ function init_config(){
 
 function parse_line(line){
     //var re = new RegExp('^(\d{2}):(\d{2}):(\d{2}) (.*)$');
-    var re = new RegExp('^(([0-9]{4})/([0-9]{2})/([0-9]{2}) ([0-9]{2}):([0-9]{2}):([0-9]{2})) (.*)$');
+    var re = new RegExp('^(([0-9]{4})[/\-]([0-9]{2})[/\-]([0-9]{2})[ T]([0-9]{2}):([0-9]{2}):([0-9]{2}))[^ ]* (.*)$');
     var m = re.exec(line);
     return m;
 }
