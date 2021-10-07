@@ -14,16 +14,16 @@
      src="https://code.jquery.com/jquery-3.3.1.min.js"
      integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
      crossorigin="anonymous"></script>
-   <title>CSVデータをプロット</title>
+   <title>時刻付きのログの前の行との時間差をプロット</title>
 </head>
 <body>
-  <h2 contenteditable="true">CSVデータをプロット</h2>
+  <h2 contenteditable="true">時刻付きのログの前の行との時間差をプロット</h2>
   <div>
     <div id="chart" style="width:100%; height: 400px;">
       <canvas id="canvas" style="width:100%; height: 400px;"></canvas>
     </div>
     <div id="data">
-      タイムスタンプ付きのCSVデータを入力してください。
+      タイムスタンプ(フォーマットが "%Y-%m-%d %H:%M:%S" または "%Y-%m-%dT%H:%M:%S")付きのCSVデータを入力してください。
       <pre id="csvdata" style="width: 100%; height: 95%;">
 2019/01/23 00:00:00 1000 10
 2019/01/23 01:00:00 1010 11
