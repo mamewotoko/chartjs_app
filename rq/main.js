@@ -35,7 +35,7 @@ function init_config(){
     };
     //COLORS.push(getRandomColor());
     var color = getRandomColor();
-    
+
     var header = "elapsed sec";
     config.data.datasets.push({label: header,
                                borderColor: color,
@@ -46,15 +46,22 @@ function init_config(){
 
 function parse_line(line){
     //var re = new RegExp('^(\d{2}):(\d{2}):(\d{2}) (.*)$');
-    var re = new RegExp('^(([0-9]{2}):([0-9]{2}):([0-9]{2})) (.*)$');
+    var re = new RegExp('^(([0-9]{2}):([0-9]{2}):([0-9]{2}(\\.[0-9]+)?)) (.*)$');
     var m = re.exec(line);
+    console.log("parse line " + m);
     return m;
 }
 
-function plot_data(chart, lines){
+function plot_data(chart){
     var initialized = false;
     var prev = 0;
-    
+
+    //var csvtext = $('#csvdata').val();
+    var csvtext = editor.getValue();
+    //time,
+    var lines = csvtext.split('\n');
+    console.log(lines);
+
     init_config(row);
 
     for (var i = 0; i < lines.length; i++){
@@ -67,7 +74,8 @@ function plot_data(chart, lines){
         if(row == null){
             continue;
         }
-        var sec_in_day = parseInt(row[2])*60*60 + parseInt(row[3])*60 + parseInt(row[4]);
+	console.log(row[2] + ", " + row[3] + ", " + row[4]);
+        var sec_in_day = parseInt(row[2])*60*60 + parseInt(row[3])*60 + parseFloat(row[4]);
         var data = 0;
         if(prev > 0){
             data = sec_in_day - prev;
@@ -82,20 +90,14 @@ function plot_data(chart, lines){
     chart.update();
 }
 
-function plot_detail(lines){
-    
-}
-
 $(document).ready(function(){
     var ctx = $("#canvas")[0].getContext('2d');
     var chart = new Chart(ctx, config);
 
-    $('#csvdata').bind('input propertychange', plot_data);
-    var csvtext = $('#csvdata').val();
-    //time,
-    var lines = csvtext.split('\n');
-    plot_data(lines);
-
-    
+    $('#csvdata').bind('input propertychange', function(){ plot_data(chart); });
+    //plot_data(chart);
+    editor.getSession().on('change', function() {
+	plot_data(chart)
+    });
     //plot_detail(lines);
 });

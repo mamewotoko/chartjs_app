@@ -17,7 +17,7 @@
 </div>
 
 タイムスタンプ付きのCSVデータを入力してください。
-<textarea id="csvdata" style="width:100%; height: 200px;">
+<pre id="csvdata" style="width:100%; height: 200px;">
 00:00:00 1000 10
 01:00:00 1010 11
 03:00:00 1030 13
@@ -68,7 +68,11 @@
 23:00:00 1060 16
 00:00:00 1050 15
 01:00:00 1040 14
-</textarea>
+</pre>
 
+<script src="js/ace.js"></script>
+<script>
+    var editor = ace.edit("csvdata");
+</script>
 <script src="main.js"></script>
 </body></html>
