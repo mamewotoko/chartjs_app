@@ -48,7 +48,6 @@ function parse_line(line){
     //var re = new RegExp('^(\d{2}):(\d{2}):(\d{2}) (.*)$');
     var re = new RegExp('^(([0-9]{2}):([0-9]{2}):([0-9]{2}(\\.[0-9]+)?)) (.*)$');
     var m = re.exec(line);
-    console.log("parse line " + m);
     return m;
 }
 
@@ -60,7 +59,7 @@ function plot_data(chart){
     var csvtext = editor.getValue();
     //time,
     var lines = csvtext.split('\n');
-    console.log(lines);
+    //console.log(lines);
 
     init_config(row);
 
@@ -71,10 +70,12 @@ function plot_data(chart){
             continue;
         }
         var row = parse_line(line);
+	console.log(row);
         if(row == null){
             continue;
         }
-	console.log(row[2] + ", " + row[3] + ", " + row[4]);
+	//console.log(row[2] + ", " + row[3] + ", " + row[4]);
+	//HH:MM:SS.ss?
         var sec_in_day = parseInt(row[2])*60*60 + parseInt(row[3])*60 + parseFloat(row[4]);
         var data = 0;
         if(prev > 0){
@@ -84,7 +85,7 @@ function plot_data(chart){
         var timestamp = row[1];
         config.data.labels.push(timestamp);
         //column
-        console.log(line);
+        //console.log(line);
         config.data.datasets[0].data.push(data);
     }
     chart.update();

@@ -72,7 +72,11 @@
 
 <script src="js/ace.js"></script>
 <script>
-    var editor = ace.edit("csvdata");
+  var editor = ace.edit("csvdata");
+  editor.setKeyboardHandler("emacs");
+  editor.setOptions({
+      maxLines: 30
+  });
 </script>
 <script src="main.js"></script>
 </body></html>
