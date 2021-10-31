@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ja"><head>
+   <meta charset="utf-8" />
+   <meta name="Author" content="Takashi Masuyama" />
+   <meta name="viewport" content="width=device-width" />
+   <script>
+     var Timeline_ajax_url = location.protocol + '//' + location.host + "/chartjs/rq/api/simile-ajax-api.js"
+   </script>
+   <script src="api/timeline-api.js?bundle=true" type="text/javascript"></script>
+   
+   <script>
+     function onLoad(){
+         //init();
+         var height = window.innerHeight;
+         document.getElementById('tl').style.height = (height - 80)+"px";
+         var eventSource = new Timeline.DefaultEventSource();
+         var theme = Timeline.ClassicTheme.create();
+         console.log('height ' + height);
+         theme.event.bubble.width = 350;
+         theme.event.bubble.height = 300;
+         var d = Timeline.DateTime.parseGregorianDateTime("2017-07-14")
+         var iOS = !!navigator.platform && /iPad|iPhone|iPod/.test(navigator.platform);
+         var bandInfos = [
+                Timeline.createBandInfo({
+                    width:          "90%", 
+                    intervalUnit:   Timeline.DateTime.HOUR,
+                    intervalPixels: 800,
+                    eventSource:    eventSource,
+                    date:           d,
+                    zone:           9,
+                    theme:          theme,
+                    layout:         'original'  // original, overview, detailed
+                }),
+                Timeline.createBandInfo({
+                    width:          "7%", 
+                    intervalUnit:   Timeline.DateTime.MONTH,
+                    intervalPixels: 300,
+                    eventSource:    eventSource,
+                    date:           d,
+                    zone:           9,
+                    theme:          theme,
+                    layout:         'overview'  // original, overview, detailed
+                }),
+                Timeline.createBandInfo({
+                    width:          "3%", 
+                    intervalUnit:   Timeline.DateTime.YEAR,
+                    intervalPixels: 500,
+                    eventSource:    eventSource,
+                    date:           d,
+                    zone:           9,
+                    theme:          theme,
+                    layout:         'overview'  // original, overview, detailed
+                }),
+         ];
+         if(! iOS){
+             bandInfos[1].syncWith = 0;
+         }
+         bandInfos[1].highlight = true;
+         if(!iOS){
+             bandInfos[2].syncWith = 0;
+         }
+         bandInfos[2].highlight = true;
+
+         var tl = Timeline.create(document.getElementById("tl"), bandInfos, Timeline.HORIZONTAL);
+         tl.loadJSON("./event.json", function(json, url) { eventSource.loadJSON(json, url); });
+         
+     }
+   </script>
+   <style>
+     .timeline-band-layer div {
+         font-size: 10px;
+     }
+   </style>
+   <title>Timeline plot</title>
+</head>
+<body onload="onLoad();">
+  Timeline plot: apache.log <a href="../cubism/cubism.html">cubism</a>
+  <div id="tl" class="timeline-default" style="height: 100%;"></div>
+</body></html>
