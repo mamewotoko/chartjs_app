@@ -58,7 +58,7 @@ var config2 = {
     },
     options: {
         scales: {
-            yAxes:[
+            y:[
                 {
                     ticks:{
                         beginAtZero: true,
